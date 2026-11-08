@@ -84,7 +84,8 @@ export async function saveInvitation(id: string, form: FormData) {
   const inv = await db.invitation.findUniqueOrThrow({ where: { id } });
   const eventAt = almaty(String(form.get("eventAt")));
   const languages = ["kk", "ru"].filter((l) => form.get(`lang_${l}`) === "on");
-  const slugWanted = String(form.get("slug") || inv.slug).trim();
+  // Frozen once paid: a new slug would break links already sent and QR codes already printed.
+  const slugWanted = inv.paidAt ? inv.slug : String(form.get("slug") || inv.slug).trim();
   const num = (v: FormDataEntryValue | null) => (v && String(v).trim() ? Number(v) : null);
 
   const photoIds = [...inv.photoIds];
@@ -138,6 +139,12 @@ export async function markPaid(id: string, form: FormData) {
   if (code) {
     const promo = await db.promoCode.findUnique({ where: { code } });
     if (!promo || (promo.validUntil && promo.validUntil < new Date())) throw new Error("Промокод жарамсыз");
+    const newPrice =
+      promo.fixedPrice != null && plan === "ready" ? promo.fixedPrice
+      : promo.discountKzt ? Math.max(0, price - promo.discountKzt)
+      : promo.kind === "partner" ? price // partner codes track referrals without a discount
+      : null;
+    if (newPrice === null) throw new Error("Бұл промокод осы тарифке жарамайды");
     // Atomic claim so a limited code (e.g. LAUNCH30) cannot be used more than maxUses times.
     const claimed = await db.promoCode.updateMany({
       where: { id: promo.id, ...(promo.maxUses ? { usedCount: { lt: promo.maxUses } } : {}) },
@@ -145,8 +152,7 @@ export async function markPaid(id: string, form: FormData) {
     });
     if (claimed.count === 0) throw new Error("Промокод лимиті бітті");
     promoCodeId = promo.id;
-    if (promo.fixedPrice != null && plan === "ready") price = promo.fixedPrice;
-    else if (promo.discountKzt) price = Math.max(0, price - promo.discountKzt);
+    price = newPrice;
   }
   await db.invitation.update({
     where: { id },

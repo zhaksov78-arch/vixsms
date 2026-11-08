@@ -71,7 +71,7 @@ export default async function Edit({ params }: { params: Promise<{ id: string }>
         <label>Той иелері (қаз.)<input name="hostsKk" defaultValue={inv.hostsKk} placeholder="Той иелері: Ерлан мен Гүлнар" /></label>
         <label>Той иелері (орыс.)<input name="hostsRu" defaultValue={inv.hostsRu} /></label>
         <label>Күні мен уақыты (Алматы)<input name="eventAt" type="datetime-local" required defaultValue={local(inv.eventAt)} /></label>
-        <label>Сілтеме (slug)<input name="slug" defaultValue={inv.slug} pattern="[a-z0-9-]+" /></label>
+        <label>Сілтеме (slug)<input name="slug" defaultValue={inv.slug} pattern="[a-z0-9-]+" readOnly={paid} title={paid ? "Төлемнен кейін өзгермейді: QR мен сілтемелер бұзылады" : undefined} /></label>
         <label>Тойхана<input name="venueName" defaultValue={inv.venueName} /></label>
         <label>Мекенжайы<input name="venueAddress" defaultValue={inv.venueAddress} /></label>
         <label>Ендік (lat)<input name="venueLat" defaultValue={inv.venueLat ?? ""} inputMode="decimal" /></label>

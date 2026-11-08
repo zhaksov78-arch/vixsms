@@ -272,8 +272,8 @@ function Rsvp({ slug, t, lang, mode, open, source }: { slug: string; t: (typeof 
     <section className="card rsvp" id="rsvp">
       <h2>{t.rsvpTitle}</h2>
       <div className="choice">
-        <button type="button" className={`btn big-btn ${attending === true ? "" : "ghost"}`} onClick={() => setAttending(true)}>{t.coming}</button>
-        <button type="button" className={`btn big-btn ${attending === false ? "" : "ghost"}`} onClick={() => setAttending(false)}>{t.notComing}</button>
+        <button type="button" className={`btn big-btn ${attending === true ? "" : "ghost"}`} aria-pressed={attending === true} onClick={() => setAttending(true)}>{t.coming}</button>
+        <button type="button" className={`btn big-btn ${attending === false ? "" : "ghost"}`} aria-pressed={attending === false} onClick={() => setAttending(false)}>{t.notComing}</button>
       </div>
       {attending !== null && (
         <form onSubmit={submit}>

@@ -18,6 +18,7 @@ const Body = z.object({
 const hits = new Map<string, number[]>();
 function limited(key: string): boolean {
   const now = Date.now();
+  if (hits.size > 10_000) hits.clear(); // shortcut: per-process memory, move to Redis if we run >1 server
   const arr = (hits.get(key) || []).filter((t) => now - t < 60_000);
   arr.push(now);
   hits.set(key, arr);
