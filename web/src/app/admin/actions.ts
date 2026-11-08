@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { checkPassword, createSession, destroySession, requireAdmin } from "@/lib/auth";
+import { verifyTotp } from "@/lib/totp";
 import { slugify, token } from "@/lib/tokens";
 import { expiresAtFor, type ProgramItem } from "@/lib/invitations";
 import { saveUpload } from "@/lib/files";
@@ -21,9 +22,13 @@ export async function login(_: unknown, form: FormData) {
   const hits = (loginHits.get(ip) || []).filter((t) => now - t < 15 * 60_000);
   loginHits.set(ip, hits);
   if (hits.length >= 10) return { error: "Тым көп әрекет. 15 минуттан кейін көріңіз." };
-  if (!checkPassword(String(form.get("password") || ""))) {
+  const totpSecret = process.env.ADMIN_TOTP_SECRET;
+  if (!totpSecret && process.env.NODE_ENV === "production") return { error: "2FA бапталмаған: ADMIN_TOTP_SECRET қойыңыз" };
+  const passOk = checkPassword(String(form.get("password") || ""));
+  const codeOk = !totpSecret || verifyTotp(totpSecret, String(form.get("code") || "").trim());
+  if (!passOk || !codeOk) {
     hits.push(now);
-    return { error: "Құпиясөз қате" };
+    return { error: "Құпиясөз немесе код қате" };
   }
   await createSession();
   redirect("/admin");
@@ -84,8 +89,22 @@ function parseProgram(text: string): ProgramItem[] {
     });
 }
 
+// Shows a readable error on the edit page instead of Next's generic production error screen.
+function failTo(id: string, e: unknown): never {
+  redirect(`/admin/i/${id}?error=${encodeURIComponent(e instanceof Error ? e.message : "Қате")}`);
+}
+
 export async function saveInvitation(id: string, form: FormData) {
   await requireAdmin();
+  try {
+    await doSave(id, form);
+  } catch (e) {
+    failTo(id, e);
+  }
+  redirect(`/admin/i/${id}`);
+}
+
+async function doSave(id: string, form: FormData) {
   const inv = await db.invitation.findUniqueOrThrow({ where: { id } });
   const eventAt = almaty(String(form.get("eventAt")));
   const languages = ["kk", "ru"].filter((l) => form.get(`lang_${l}`) === "on");
@@ -132,11 +151,19 @@ export async function saveInvitation(id: string, form: FormData) {
     },
   });
   if (inv.status === "draft") await db.invitation.update({ where: { id }, data: { status: "preview" } });
-  revalidatePath(`/admin/i/${id}`);
 }
 
 export async function markPaid(id: string, form: FormData) {
   await requireAdmin();
+  try {
+    await doMarkPaid(id, form);
+  } catch (e) {
+    failTo(id, e);
+  }
+  redirect(`/admin/i/${id}`);
+}
+
+async function doMarkPaid(id: string, form: FormData) {
   const plan = String(form.get("plan") || "ready") as Plan;
   const code = String(form.get("promo") || "").trim().toUpperCase();
   let price: number = PLANS[plan].price;
@@ -163,7 +190,6 @@ export async function markPaid(id: string, form: FormData) {
     where: { id },
     data: { status: "published", plan, priceKzt: price, promoCodeId, paidAt: new Date(), paidBy: "admin" },
   });
-  revalidatePath(`/admin/i/${id}`);
 }
 
 export async function refund(id: string, form: FormData) {

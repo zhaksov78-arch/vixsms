@@ -94,6 +94,8 @@ export default function InvitationView({ inv, template, mode, rsvpOpen, source }
       <header className="hero">
         <p className="eyebrow">{eventLabel}</p>
         <h1>{title}</h1>
+        <div className="divider" aria-hidden><span /></div>
+        <p className="hero-date">{formatDate(eventAt, lang)} · {formatTime(eventAt)}</p>
         {inv.photoUrls[0] && !elder && <img className="hero-photo" src={inv.photoUrls[0]} alt={title} />}
       </header>
 

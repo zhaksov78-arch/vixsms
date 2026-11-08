@@ -16,9 +16,10 @@ function local(d: Date | null): string {
   return new Date(d.getTime() + 5 * 3600_000).toISOString().slice(0, 16);
 }
 
-export default async function Edit({ params }: { params: Promise<{ id: string }> }) {
+export default async function Edit({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string }> }) {
   await requireAdmin();
   const { id } = await params;
+  const { error } = await searchParams;
   const inv = await db.invitation.findUnique({ where: { id }, include: { promoCode: true } });
   if (!inv) notFound();
   const s = await summary(inv.id);
@@ -44,6 +45,7 @@ export default async function Edit({ params }: { params: Promise<{ id: string }>
         <span className={`badge ${inv.status}`}>{inv.status}</span>
       </div>
 
+      {error && <p className="card err" role="alert">{error}</p>}
       <section className="card links">
         <p><b>Алдын ала көрініс (клиентке):</b> <a href={previewUrl} target="_blank">{previewUrl}</a></p>
         {paid && <p><b>Қонақтарға:</b> <a href={guestUrl} target="_blank">{guestUrl}</a></p>}

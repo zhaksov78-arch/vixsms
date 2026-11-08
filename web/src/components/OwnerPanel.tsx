@@ -139,11 +139,11 @@ export default function OwnerPanel({ token, title, when, link, reminder }: { tok
             <tbody>
               {rows.map((r) => (
                 <tr key={r.id}>
-                  <td>{r.name}{r.wish && <div className="muted small">{r.wish}</div>}</td>
-                  <td><button className="link" onClick={() => changeCount(r)}>{r.attending ? r.guestsCount : "—"}</button></td>
-                  <td><span className={`badge ${r.attending ? "published" : "refunded"}`}>{r.attending ? "Келеді" : "Келмейді"}</span></td>
-                  <td>{r.phone ?? ""}</td>
-                  <td>{SRC[r.source]}</td>
+                  <td data-label="Аты-жөні">{r.name}{r.wish && <div className="muted small">{r.wish}</div>}</td>
+                  <td data-label="Саны"><button className="link" onClick={() => changeCount(r)}>{r.attending ? r.guestsCount : "—"}</button></td>
+                  <td data-label="Жауабы"><span className={`badge ${r.attending ? "published" : "refunded"}`}>{r.attending ? "Келеді" : "Келмейді"}</span></td>
+                  <td data-label="Телефон">{r.phone ?? ""}</td>
+                  <td data-label="Арна">{SRC[r.source]}</td>
                   <td><button className="link danger" onClick={() => remove(r.id)}>Өшіру</button></td>
                 </tr>
               ))}
