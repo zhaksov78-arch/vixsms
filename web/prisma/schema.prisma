@@ -1,0 +1,129 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum InvitationStatus {
+  draft
+  preview
+  paid
+  published
+  archived
+  refunded
+}
+
+enum EventType {
+  wedding
+  qyz_uzatu
+  sundet
+  tusau_keser
+  merey_toi
+  other
+}
+
+enum Plan {
+  ready
+  family
+  constructor
+}
+
+enum RsvpSource {
+  link
+  qr
+  manual
+}
+
+enum PromoKind {
+  discount
+  partner
+}
+
+model Invitation {
+  id            String           @id @default(uuid())
+  slug          String           @unique
+  status        InvitationStatus @default(draft)
+  templateId    String           @default("classic")
+  eventType     EventType        @default(wedding)
+  languages     String[]         @default(["kk"])
+  titleKk       String           @default("")
+  titleRu       String           @default("")
+  hostsKk       String           @default("")
+  hostsRu       String           @default("")
+  messageKk     String           @default("")
+  messageRu     String           @default("")
+  eventAt       DateTime
+  venueName     String           @default("")
+  venueAddress  String           @default("")
+  venueLat      Float?
+  venueLng      Float?
+  program       Json             @default("[]")
+  photoIds      String[]         @default([])
+  musicFileId   String?
+  voiceFileId   String?
+  rsvpOpen      Boolean          @default(true)
+  rsvpDeadline  DateTime?
+  ownerToken    String           @unique
+  previewToken  String           @unique
+  plan          Plan             @default(ready)
+  priceKzt      Int              @default(7900)
+  promoCodeId   String?
+  promoCode     PromoCode?       @relation(fields: [promoCodeId], references: [id])
+  paidAt        DateTime?
+  paidBy        String?
+  refundedAt    DateTime?
+  refundReason  String?
+  isPortfolio   Boolean          @default(false)
+  expiresAt     DateTime
+  piiErasedAt   DateTime?
+  clientName    String           @default("")
+  clientPhone   String           @default("")
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  rsvps         Rsvp[]
+}
+
+model Rsvp {
+  id           String     @id @default(uuid())
+  invitationId String
+  invitation   Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  name         String
+  attending    Boolean
+  guestsCount  Int        @default(1)
+  phone        String?
+  wish         String?
+  source       RsvpSource @default(link)
+  consentAt    DateTime?
+  deviceKey    String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([invitationId])
+  @@unique([invitationId, deviceKey])
+}
+
+model PromoCode {
+  id          String       @id @default(uuid())
+  code        String       @unique
+  kind        PromoKind    @default(discount)
+  fixedPrice  Int?
+  discountKzt Int?
+  partnerName String?
+  maxUses     Int?
+  usedCount   Int          @default(0)
+  validUntil  DateTime?
+  createdAt   DateTime     @default(now())
+  invitations Invitation[]
+}
+
+model File {
+  id         String   @id @default(uuid())
+  kind       String
+  storageKey String
+  mime       String
+  size       Int
+  createdAt  DateTime @default(now())
+}
