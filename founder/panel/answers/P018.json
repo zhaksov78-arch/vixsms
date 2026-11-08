@@ -1,13 +1,13 @@
 {
   "id": "P018",
-  "buys": false,
-  "purchases_first_month": 0,
-  "reason_code": "trust",
-  "reason": "Ақшасы мәселе емес, 7 900 ₸ мен үшін түк те емес. Бірақ 200-ден астам қонағы бар тойдың шақыруын жарнамадан көрген белгісіз адамдарға сеніп тапсырмаймын, туыстарым не достарым ұсынған маманға ғана беремін.",
-  "objection": "Бұларды ешкім маған ұсынған жоқ. Сілтеме тойдың алдында істемей қалса не ақсақалдарға дұрыс көрінбесе, ұятқа қалатын мен боламын, 7 900 ₸ қайтарғанынан пайда жоқ. Оның үстіне Kaspi Объявленияда мұны 5 000 ₸-ге жасайтындар бар.",
-  "would_change_my_mind": "Жақын туысым не досым өз тойында қолданып, сілтемесін көрсетіп, мақтаса.",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "convenience",
+  "reason": "With over 200 guests, a list showing who is actually coming and an exact headcount for the toikhana is worth far more to me than 7 900 or even 19 900 tenge. The free preview means I risk nothing, so I would try it and probably take the Aulet package.",
+  "objection": "Nobody I know has recommended them. I normally only trust a specialist a relative or friend has praised, and a Kaspi Obyavleniya person will do an invitation for 5 000 tenge, so why would I go to strangers?",
+  "would_change_my_mind": "",
   "price_too_cheap": 3000,
-  "price_cheap": 7000,
-  "price_expensive": 25000,
-  "price_too_expensive": 50000
+  "price_cheap": 7900,
+  "price_expensive": 30000,
+  "price_too_expensive": 60000
 }
