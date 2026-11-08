@@ -130,7 +130,7 @@ export default function OwnerPanel({ token, title, when, link, reminder }: { tok
             </button>
           ))}
         </div>
-        {data?.piiErased && <p className="muted">Тойдан 90 күн өтті, қонақтардың деректері өшірілді.</p>}
+        {data?.piiErased && <p className="muted">Той өткеніне 90 күн болды, сондықтан біз қонақтардың аты мен телефонын өшірдік.</p>}
         <div className="table-wrap">
           <table>
             <thead>

@@ -2,9 +2,17 @@
 const nextConfig = {
   poweredByHeader: false,
   serverExternalPackages: ["exceljs"],
-  experimental: { serverActions: { bodySizeLimit: "12mb" } },
+  // 10 phone photos of ~5 MB each in one save. shortcut: also cap the body at the reverse proxy (nginx client_max_body_size).
+  experimental: { serverActions: { bodySizeLimit: "60mb" } },
   async headers() {
     return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Frame-Options", value: "DENY" }, // no clickjacking of admin/host panels
+          { key: "X-Content-Type-Options", value: "nosniff" },
+        ],
+      },
       {
         source: "/manage/:path*",
         headers: [

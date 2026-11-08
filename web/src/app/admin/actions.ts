@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { checkPassword, createSession, destroySession, requireAdmin } from "@/lib/auth";
@@ -10,14 +11,18 @@ import { saveUpload } from "@/lib/files";
 import { PLANS } from "@/lib/brand";
 import type { EventType, Plan } from "@prisma/client";
 
-const loginHits: number[] = [];
+// Per IP, so a stranger's failed guesses cannot lock the real admin out.
+const loginHits = new Map<string, number[]>(); // shortcut: per-process memory, move to Redis if we run >1 server
 
 export async function login(_: unknown, form: FormData) {
   const now = Date.now();
-  while (loginHits.length && now - loginHits[0] > 15 * 60_000) loginHits.shift();
-  if (loginHits.length >= 10) return { error: "Тым көп әрекет. 15 минуттан кейін көріңіз." };
+  const ip = (await headers()).get("x-forwarded-for")?.split(",")[0].trim() || "local";
+  if (loginHits.size > 10_000) loginHits.clear();
+  const hits = (loginHits.get(ip) || []).filter((t) => now - t < 15 * 60_000);
+  loginHits.set(ip, hits);
+  if (hits.length >= 10) return { error: "Тым көп әрекет. 15 минуттан кейін көріңіз." };
   if (!checkPassword(String(form.get("password") || ""))) {
-    loginHits.push(now);
+    hits.push(now);
     return { error: "Құпиясөз қате" };
   }
   await createSession();
