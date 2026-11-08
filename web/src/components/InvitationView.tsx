@@ -287,7 +287,7 @@ function Rsvp({ slug, t, lang, mode, open, source }: { slug: string; t: (typeof 
           <label className="check">
             <input type="checkbox" name="consent" required /> {t.consent} (<a href={`/privacy?lang=${lang}`} target="_blank">{t.privacy}</a>)
           </label>
-          <button className="btn big-btn" disabled={busy}>{t.send}</button>
+          <button className="btn big-btn" disabled={busy} aria-busy={busy}>{busy ? "…" : t.send}</button>
           {err && <p className="err">{err}</p>}
         </form>
       )}

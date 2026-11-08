@@ -110,20 +110,20 @@ export default function OwnerPanel({ token, title, when, link, reminder }: { tok
       <section className="card">
         <h2>Телефонмен жауап бергенді қосу</h2>
         <form className="addrow" onSubmit={add}>
-          <input name="name" placeholder="Аты-жөні" required maxLength={80} />
-          <select name="attending" defaultValue="yes">
+          <input name="name" placeholder="Аты-жөні" aria-label="Аты-жөні" required maxLength={80} />
+          <select name="attending" defaultValue="yes" aria-label="Жауабы">
             <option value="yes">Келеді</option>
             <option value="no">Келмейді</option>
           </select>
           <input name="guestsCount" type="number" min={1} max={30} defaultValue={1} aria-label="Адам саны" />
-          <input name="phone" type="tel" placeholder="Телефон" maxLength={20} />
+          <input name="phone" type="tel" placeholder="Телефон" aria-label="Телефон" maxLength={20} />
           <button className="btn">Қосу</button>
         </form>
       </section>
 
       <section className="card">
         <div className="filters">
-          <input placeholder="Іздеу…" value={q} onChange={(e) => setQ(e.target.value)} />
+          <input placeholder="Іздеу…" aria-label="Аты бойынша іздеу" value={q} onChange={(e) => setQ(e.target.value)} />
           {(["all", "yes", "no", "manual"] as const).map((k) => (
             <button key={k} className={`pill ${filter === k ? "on" : ""}`} onClick={() => setFilter(k)}>
               {{ all: "Барлығы", yes: "Келеді", no: "Келмейді", manual: "Қолмен" }[k]}
@@ -141,7 +141,7 @@ export default function OwnerPanel({ token, title, when, link, reminder }: { tok
                 <tr key={r.id}>
                   <td>{r.name}{r.wish && <div className="muted small">{r.wish}</div>}</td>
                   <td><button className="link" onClick={() => changeCount(r)}>{r.attending ? r.guestsCount : "—"}</button></td>
-                  <td>{r.attending ? "✅ Келеді" : "❌ Келмейді"}</td>
+                  <td><span className={`badge ${r.attending ? "published" : "refunded"}`}>{r.attending ? "Келеді" : "Келмейді"}</span></td>
                   <td>{r.phone ?? ""}</td>
                   <td>{SRC[r.source]}</td>
                   <td><button className="link danger" onClick={() => remove(r.id)}>Өшіру</button></td>
