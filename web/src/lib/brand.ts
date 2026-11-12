@@ -1,6 +1,6 @@
 // The brand name lives here only. Change it in one place when the name is chosen.
 export const BRAND = {
-  name: "Той шақыру",
+  name: "Toisan",
   tagline: "Тойханаға нақты сан",
   colors: {
     green: "#1F4D3A",
