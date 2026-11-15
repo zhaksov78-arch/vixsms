@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { T, EVENT_LABEL, formatDate, formatTime, type Lang } from "@/lib/i18n";
+import { T, EVENT_LABEL, dateParts, formatDate, formatTime, type Lang } from "@/lib/i18n";
+import Cover from "./Cover";
 import type { Template } from "@/lib/templates";
 
 export type InvitationData = {
@@ -58,6 +59,7 @@ export default function InvitationView({ inv, template, mode, rsvpOpen, source }
   const hosts = (lang === "kk" ? inv.hostsKk : inv.hostsRu) || inv.hostsKk || inv.hostsRu;
   const message = (lang === "kk" ? inv.messageKk : inv.messageRu) || inv.messageKk || inv.messageRu;
   const eventLabel = EVENT_LABEL[inv.eventType]?.[lang] ?? "";
+  const dp = dateParts(eventAt, lang);
 
   const mapQuery = inv.venueLat && inv.venueLng ? `${inv.venueLat},${inv.venueLng}` : inv.venueAddress;
   const gis = inv.venueLat && inv.venueLng
@@ -71,7 +73,8 @@ export default function InvitationView({ inv, template, mode, rsvpOpen, source }
     "--text": template.text,
     "--accent": template.accent,
     "--accent-text": template.accentText,
-    "--ornament": template.ornament,
+    "--cover-bg": template.coverBg,
+    "--cover-text": template.coverText,
   } as React.CSSProperties;
 
   return (
@@ -91,13 +94,8 @@ export default function InvitationView({ inv, template, mode, rsvpOpen, source }
         )}
       </div>
 
-      <header className="hero">
-        <p className="eyebrow">{eventLabel}</p>
-        <h1>{title}</h1>
-        <div className="divider" aria-hidden><span /></div>
-        <p className="hero-date">{formatDate(eventAt, lang)} · {formatTime(eventAt)}</p>
-        {inv.photoUrls[0] && !elder && <img className="hero-photo" src={inv.photoUrls[0]} alt={title} />}
-      </header>
+      <Cover template={template} label={eventLabel} title={title} {...dp} sub={`${dp.year} · ${formatTime(eventAt)}`}
+        venue={inv.venueName} photo={elder ? null : inv.photoUrls[0]} />
 
       <main className="body">
         {mode === "over" ? (
@@ -128,7 +126,7 @@ export default function InvitationView({ inv, template, mode, rsvpOpen, source }
                 <h2>{t.program}</h2>
                 <ul className="program">
                   {inv.program.map((p, i) => (
-                    <li key={i}><b>{p.time}</b> {(lang === "kk" ? p.textKk : p.textRu) || p.textKk || p.textRu}</li>
+                    <li key={i}><b>{p.time}</b><span>{(lang === "kk" ? p.textKk : p.textRu) || p.textKk || p.textRu}</span></li>
                   ))}
                 </ul>
               </section>

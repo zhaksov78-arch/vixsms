@@ -1,3 +1,8 @@
+import "@fontsource/inter/400.css";
+import "@fontsource/inter/600.css";
+import "@fontsource/cormorant-garamond/500.css";
+import "@fontsource/cormorant-garamond/600.css";
+import "@fontsource/cormorant-garamond/500-italic.css";
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import { BRAND } from "@/lib/brand";
@@ -12,14 +17,6 @@ export const viewport: Viewport = { width: "device-width", initialScale: 1 };
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="kk">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Lora:wght@600&display=swap&subset=cyrillic-ext"
-          rel="stylesheet"
-        />
-      </head>
       <body>{children}</body>
     </html>
   );

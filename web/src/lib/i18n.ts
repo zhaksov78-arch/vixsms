@@ -106,6 +106,11 @@ export function formatDate(d: Date, lang: Lang): string {
     : `${p.day} ${MONTHS.ru[p.m]} ${p.y} г., ${WEEKDAYS.ru[p.wd]}`;
 }
 
+export function dateParts(d: Date, lang: Lang) {
+  const p = almatyParts(d);
+  return { weekday: WEEKDAYS[lang][p.wd], day: String(p.day), month: MONTHS[lang][p.m], year: String(p.y) };
+}
+
 export function formatTime(d: Date): string {
   const p = almatyParts(d);
   return `${String(p.h).padStart(2, "0")}:${String(p.min).padStart(2, "0")}`;

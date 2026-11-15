@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { EVENT_LABEL } from "@/lib/i18n";
+import { EVENT_LABEL, dateParts } from "@/lib/i18n";
 import type { Template } from "@/lib/templates";
+import Cover from "./Cover";
 
 const TYPES = ["wedding", "qyz_uzatu", "sundet", "tusau_keser", "merey_toi"];
-const SAMPLE_NAME: Record<string, string> = { wedding: "Аружан & Мади", qyz_uzatu: "Аружан", sundet: "Әли", tusau_keser: "Айлин", merey_toi: "Ерлан · 60" };
+// Made-up sample names, not real clients.
+const SAMPLE: Record<string, string> = { wedding: "Аружан & Мади", qyz_uzatu: "Аружан", sundet: "Әли", tusau_keser: "Айлин", merey_toi: "Ерлан 60 жаста" };
+const DP = dateParts(new Date("2027-08-24T13:00:00Z"), "kk");
 
 export default function TemplateGallery({ templates, waBase }: { templates: Template[]; waBase: string }) {
   const [type, setType] = useState("wedding");
@@ -21,17 +24,15 @@ export default function TemplateGallery({ templates, waBase }: { templates: Temp
       </div>
       <div className="lp-templates">
         {list.map((t) => (
-          <div key={t.id} className="lp-tpl" style={{ "--tpl-bg": t.ornament, "--tpl-accent": t.accent } as React.CSSProperties}>
-            <span className="lp-tpl-type">{EVENT_LABEL[type].kk}</span>
-            <span className="lp-tpl-names">{SAMPLE_NAME[type]}</span>
-            <span className="lp-tpl-divider" aria-hidden />
-            <span className="lp-tpl-date">24.08.2026</span>
-            <span className="lp-tpl-actions">
-              <a className="btn ghost light" href={`/demo/${t.id}?type=${type}`} target="_blank" rel="noopener">Көру</a>
-              <a className="btn gold" href={waBase === "#" ? "#" : `${waBase}${encodeURIComponent(` Маған «${t.name}» үлгісі ұнады (${EVENT_LABEL[type].kk}).`)}`} target="_blank" rel="noopener">Таңдау</a>
-            </span>
-            <span className="lp-tpl-label">{t.name}</span>
-          </div>
+          <article key={t.id} className="lp-tpl">
+            <a href={`/demo/${t.id}?type=${type}`} target="_blank" rel="noopener" aria-label={`«${t.name}» үлгісін ашып көру`}>
+              <Cover mini template={t} label={EVENT_LABEL[type].kk} title={SAMPLE[type]} {...DP} sub="2027 · 18:00" venue="Royal Palace" />
+            </a>
+            <div className="lp-tpl-meta">
+              <b>{t.name}</b>
+              <a className="btn" href={waBase === "#" ? "#" : `${waBase}${encodeURIComponent(` Маған «${t.name}» үлгісі ұнады (${EVENT_LABEL[type].kk}).`)}`} target="_blank" rel="noopener">Таңдау</a>
+            </div>
+          </article>
         ))}
       </div>
     </>

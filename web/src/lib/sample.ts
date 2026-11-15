@@ -18,7 +18,7 @@ export function sampleInvitation(eventType: string): InvitationData {
     ...SAMPLE[type],
     hostsKk: "Той иелері: Ерлан мен Гүлнар",
     hostsRu: "Хозяева тоя: Ерлан и Гульнар",
-    eventAt: "2026-08-24T13:00:00.000Z",
+    eventAt: "2027-08-24T13:00:00.000Z",
     venueName: "«Royal Palace» тойханасы",
     venueAddress: "Алматы, Абай даңғылы, 1",
     venueLat: null,
