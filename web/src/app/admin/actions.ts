@@ -46,7 +46,7 @@ function almaty(local: string): Date {
   return d;
 }
 
-const RESERVED = new Set(["admin", "api", "p", "manage", "privacy", "offer", "_next", "favicon-ico", "robots-txt"]);
+const RESERVED = new Set(["admin", "api", "p", "manage", "privacy", "offer", "_next", "favicon-ico", "robots-txt", "demo"]);
 
 async function uniqueSlug(base: string, exceptId?: string) {
   let slug = slugify(base);

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { BRAND, PLANS, WHATSAPP_NUMBER } from "@/lib/brand";
 import { TEMPLATES } from "@/lib/templates";
+import TemplateGallery from "@/components/TemplateGallery";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ r
     orderBy: { eventAt: "desc" },
     take: 4,
   });
+  // Social proof from real data only, and only once the number means something.
+  const answered = await db.rsvp.count();
   const launch = await db.promoCode.findUnique({ where: { code: "LAUNCH30" } });
   const launchLeft =
     launch && launch.maxUses && (!launch.validUntil || launch.validUntil > new Date())
@@ -44,7 +47,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ r
 
       <header className="lp-hero">
         <div className="lp-hero-text">
-          <p className="lp-badge">Онлайн той шақыру сервисі</p>
+          <p className="lp-badge">{answered >= 100 ? `${answered.toLocaleString("ru-RU")} қонақ ${BRAND.name} арқылы жауап берді` : "Онлайн той шақыру сервисі"}</p>
           <h1>Тойыңызға нақты сан!</h1>
           <p className="lead">
             Біз әдемі онлайн шақыру жасаймыз. Қонақтарыңыз бір батырмамен жауап береді, ал сіз кімнің келетінін тойдан бұрын білесіз.
@@ -53,6 +56,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ r
             <a className="btn" href={wa()} target="_blank" rel="noopener">Шақыру жасау <Icon name="arrow" /></a>
             <a className="btn ghost" href="#templates"><Icon name="play" /> Үлгілерді көру</a>
           </div>
+          <p className="lp-price-note"><b>{PLANS.ready.price.toLocaleString("ru-RU")} ₸</b> · Алдымен тегін көрініс, ұнамаса төлемейсіз</p>
         </div>
         <div className="lp-hero-visual">
           {HERO_PHOTO ? (
@@ -80,17 +84,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ r
           <h2>Шақыру үлгілері</h2>
           {portfolio.length > 0 && <a href={`/${portfolio[0].slug}`}>Мысалды ашу <Icon name="arrow" /></a>}
         </div>
-        <div className="lp-templates">
-          {TEMPLATES.map((t) => (
-            <a key={t.id} className="lp-tpl" href={wa(`Маған «${t.name}» үлгісі ұнады.`)} target="_blank" rel="noopener"
-              style={{ "--tpl-bg": t.ornament, "--tpl-accent": t.accent } as React.CSSProperties}>
-              <span className="lp-tpl-names">Аружан &amp; Мади</span>
-              <span className="lp-tpl-divider" aria-hidden />
-              <span className="lp-tpl-date">24.08.2026</span>
-              <span className="lp-tpl-label">{t.name}</span>
-            </a>
-          ))}
-        </div>
+        <TemplateGallery templates={TEMPLATES} waBase={wa()} />
       </section>
 
       <section className="lp-section">
@@ -139,6 +133,10 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ r
         <h2>Сұрақтар</h2>
         <details><summary>Үлкен кісілер аша ала ма?</summary><p>Иә, беттің басындағы «Үлкен әріппен көру» батырмасын бассаңыз болды. Телефонмен жауап берген ақсақалдарды тізімге өзіңіз қосасыз.</p></details>
         <details><summary>Сайт қашанға дейін тұрады?</summary><p>Тойдан кейін кемінде 3 ай. Содан соң біз қонақтардың аты мен телефонын өшіреміз.</p></details>
+        <details><summary>Шақыруды кейін өзгерте аламын ба?</summary><p>Иә. Тойға дейін мәтінді, фотоны, уақытты және үлгіні тегін өзгертеміз. Үлгіні ауыстырғанда мәтін мен фото сақталады.</p></details>
+        <details><summary>Қонақтар тізімін жұбайыммен немесе тойханамен бөлісе аламын ба?</summary><p>Иә. Той иесінің панеліне апаратын сілтемені кімге жіберсеңіз, сол тізімді көреді. Тойханаға Excel файлын жүктеп бересіз.</p></details>
+        <details><summary>Неге музыка өзі қосылмайды?</summary><p>Телефондардағы браузерлер дыбысты өздігінен қосуға тыйым салады. Қонақ «Әнді қосу» батырмасын басқанда ән ойнайды.</p></details>
+        <details><summary>WhatsApp-та сілтеменің суреті неге шықпай тұр?</summary><p>WhatsApp сілтеменің суретін бірінші жіберуде жүктейді. Бір-екі минуттан кейін қайта жіберіп көріңіз. Сурет ретінде шақырудың бірінші фотосы шығады.</p></details>
         <details><summary>Ақша қайтарыла ма?</summary><p>Алдымен тегін алдын ала көрініс жібереміз. Ұнамаса, төлемейсіз. Төлегеннен кейін ұнамаса, 24 сағатта қайта жасаймыз немесе ақшаны қайтарамыз.</p></details>
       </section>
 
